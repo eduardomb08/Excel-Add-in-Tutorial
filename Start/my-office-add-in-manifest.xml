@@ -13,11 +13,11 @@
 
   <!--Version. Updates from the store only get triggered if there is a version change. -->
   <Version>1.0.0.0</Version>
-  <ProviderName>[Provider name]</ProviderName>
+  <ProviderName>EMB</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <!-- The display name of your add-in. Used on the store and various places of the Office UI such as the add-ins dialog. -->
   <DisplayName DefaultValue="My Office Add-in" />
-  <Description DefaultValue="[Workbook Add-in description]"/>
+  <Description DefaultValue="Excel add-in tutorial"/>
 
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
@@ -74,7 +74,8 @@
           <!-- PrimaryCommandSurface is the main Office Ribbon. -->
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <!-- Use OfficeTab to extend an existing Tab. Use CustomTab to create a new tab. -->
-            <OfficeTab id="TabHome">
+            <CustomTab id="TabCustom1">
+              <Label resid="customTabLabel1" />
               <!-- Ensure you provide a unique id for the group. Recommendation for any IDs is to namespace using your company name. -->
               <Group id="Contoso.Group1">
                 <!-- Label for your group. resid must point to a ShortString resource. -->
@@ -109,8 +110,23 @@
                     <SourceLocation resid="Contoso.Taskpane.Url" />
                   </Action>
                 </Control>
+                <Control xsi:type="Button" id="ToggleProtection">
+                  <Label resid="ProtectionButtonLabel" />
+                  <Supertip>            
+                      <Title resid="ProtectionButtonLabel" />
+                      <Description resid="ProtectionButtonToolTip" />
+                  </Supertip>
+                  <Icon>
+                      <bt:Image size="16" resid="Contoso.tpicon_16x16" />
+                      <bt:Image size="32" resid="Contoso.tpicon_32x32" />
+                      <bt:Image size="80" resid="Contoso.tpicon_80x80" />
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                      <FunctionName>toggleProtection</FunctionName>
+                  </Action>
+              </Control>
               </Group>
-            </OfficeTab>
+            </CustomTab>
           </ExtensionPoint>
         </DesktopFormFactor>
       </Host>
@@ -130,14 +146,17 @@
       </bt:Urls>
       <!-- ShortStrings max characters==125. -->
       <bt:ShortStrings>
+        <bt:String id="customTabLabel1" DefaultValue="My Custom Tab" />
         <bt:String id="Contoso.TaskpaneButton.Label" DefaultValue="Show Taskpane" />
         <bt:String id="Contoso.Group1Label" DefaultValue="Commands Group" />
         <bt:String id="Contoso.GetStarted.Title" DefaultValue="Get started with your sample add-in!" />
+        <bt:String id="ProtectionButtonLabel" DefaultValue="Toggle Worksheet Protection" />
       </bt:ShortStrings>
       <!-- LongStrings max characters==250. -->
       <bt:LongStrings>
         <bt:String id="Contoso.TaskpaneButton.Tooltip" DefaultValue="Click to Show a Taskpane" />
         <bt:String id="Contoso.GetStarted.Description" DefaultValue="Your sample add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started." />
+        <bt:String id="ProtectionButtonToolTip" DefaultValue="Click to protect or unprotect the current worksheet." />
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

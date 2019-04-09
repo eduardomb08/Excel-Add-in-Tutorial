@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/*
 	 * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
@@ -51,10 +51,9 @@
 
 	'use strict';
 
-	__webpack_require__(1);
-
 	(function () {
-	    Office.initialize = function (reason) {
+
+	    Office.onReady().then(function () {
 	        $(document).ready(function () {
 
 	            if (!Office.context.requirements.isSetSupported('ExcelApi', 1.7)) {
@@ -68,13 +67,13 @@
 	            $('#freeze-header').click(freezeHeader);
 	            $('#open-dialog').click(openDialog);
 	        });
-	    };
+	    });
 
 	    function createTable() {
 	        Excel.run(function (context) {
 
-	            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
-	            const expensesTable = currentWorksheet.tables.add("A1:D1", true /*hasHeaders*/);
+	            var currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+	            var expensesTable = currentWorksheet.tables.add("A1:D1", true /*hasHeaders*/);
 	            expensesTable.name = "ExpensesTable";
 
 	            expensesTable.getHeaderRowRange().values = [["Date", "Merchant", "Category", "Amount"]];
@@ -97,9 +96,9 @@
 	    function filterTable() {
 	        Excel.run(function (context) {
 
-	            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
-	            const expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
-	            const categoryFilter = expensesTable.columns.getItem('Category').filter;
+	            var currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+	            var expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
+	            var categoryFilter = expensesTable.columns.getItem('Category').filter;
 	            categoryFilter.applyValuesFilter(["Education", "Groceries"]);
 
 	            return context.sync();
@@ -114,9 +113,9 @@
 	    function sortTable() {
 	        Excel.run(function (context) {
 
-	            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
-	            const expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
-	            const sortFields = [{
+	            var currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+	            var expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
+	            var sortFields = [{
 	                key: 1, // Merchant column
 	                ascending: false
 	            }];
@@ -135,11 +134,11 @@
 	    function createChart() {
 	        Excel.run(function (context) {
 
-	            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
-	            const expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
-	            const dataRange = expensesTable.getDataBodyRange();
+	            var currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+	            var expensesTable = currentWorksheet.tables.getItem('ExpensesTable');
+	            var dataRange = expensesTable.getDataBodyRange();
 
-	            let chart = currentWorksheet.charts.add('ColumnClustered', dataRange, 'auto');
+	            var chart = currentWorksheet.charts.add('ColumnClustered', dataRange, 'auto');
 
 	            chart.setPosition("A15", "F30");
 	            chart.title.text = "Expenses";
@@ -147,6 +146,7 @@
 	            chart.legend.format.fill.setSolidColor("white");
 	            chart.dataLabels.format.font.size = 15;
 	            chart.dataLabels.format.font.color = "black";
+	            chart.series.getItemAt(0).name = 'Value in €';
 
 	            return context.sync();
 	        }).catch(function (error) {
@@ -160,7 +160,7 @@
 	    function freezeHeader() {
 	        Excel.run(function (context) {
 
-	            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+	            var currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
 	            currentWorksheet.freezePanes.freezeRows(1);
 
 	            return context.sync();
@@ -172,62 +172,19 @@
 	        });
 	    }
 
-	    let dialog = null;
-
+	    var dialog = null;
 	    function openDialog() {
-	        Office.context.ui.displayDialogAsync('https://localhost:3000/popup.html', { height: 35, width: 25 }, function (result) {
+	        Office.context.ui.displayDialogAsync('https://localhost:3000/popup.html', { height: 45, width: 35 }, function (result) {
 	            dialog = result.value;
 	            dialog.addEventHandler(Microsoft.Office.WebExtension.EventType.DialogMessageReceived, processMessage);
 	        });
 	    }
 
 	    function processMessage(arg) {
-	        console.log(arg.message);
 	        $('#user-name').text(arg.message);
 	        dialog.close();
 	    }
 	})();
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	/*
-	 * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
-	 * See LICENSE in the project root for license information.
-	 */
-
-	'use strict';
-
-	(function () {
-
-	    Office.initialize = function (reason) {
-
-	        //If you need to initialize something you can do so here. 
-
-	    };
-	})();
-
-	function toggleProtection(args) {
-	    Excel.run(function (context) {
-	        const sheet = context.workbook.worksheets.getActiveWorksheet();
-	        sheet.load('protection/protected');
-
-	        return context.sync().then(function () {
-	            if (sheet.protection.protected) {
-	                sheet.protection.unprotect();
-	            } else {
-	                sheet.protection.protect();
-	            }
-	        }).then(context.sync);
-	    }).catch(function (error) {
-	        console.log("Error: " + error);
-	        if (error instanceof OfficeExtension.Error) {
-	            console.log("Debug info: " + JSON.stringify(error.debugInfo));
-	        }
-	    });
-	    args.completed();
-	}
 
 /***/ }
 /******/ ]);
